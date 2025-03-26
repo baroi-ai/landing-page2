@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,15 +53,21 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+				cyan: {
+					light: '#00f0ff',
+					DEFAULT: '#00c3ff',
+					dark: '#0099ff',
+				},
+				dark: {
+					100: '#1a1a2e',
+					200: '#16213e',
+					300: '#0f172a',
+					400: '#080f1c',
+					500: '#020617',
+				},
+				glass: {
+					DEFAULT: 'rgba(16, 18, 27, 0.4)',
+					darker: 'rgba(12, 14, 21, 0.7)',
 				}
 			},
 			borderRadius: {
@@ -70,26 +77,71 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' },
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
-				}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' },
+				},
+				pulse: {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.5' },
+				},
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' },
+				},
+				glow: {
+					'0%, 100%': { boxShadow: '0 0 5px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.2)' },
+					'50%': { boxShadow: '0 0 20px rgba(0, 240, 255, 0.8), 0 0 30px rgba(0, 240, 255, 0.4)' },
+				},
+				fadeIn: {
+					'0%': { opacity: '0', transform: 'translateY(10px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' },
+				},
+				scaleIn: {
+					'0%': { opacity: '0', transform: 'scale(0.95)' },
+					'100%': { opacity: '1', transform: 'scale(1)' },
+				},
+				shimmer: {
+					'0%': { backgroundPosition: '-500px 0' },
+					'100%': { backgroundPosition: '500px 0' },
+				},
+				'gradient-xy': {
+					'0%, 100%': { backgroundSize: '400% 400%', backgroundPosition: 'left top' },
+					'50%': { backgroundSize: '200% 200%', backgroundPosition: 'right bottom' },
+				},
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				float: 'float 6s ease-in-out infinite',
+				glow: 'glow 3s ease-in-out infinite',
+				fadeIn: 'fadeIn 0.5s ease-out',
+				scaleIn: 'scaleIn 0.5s ease-out',
+				shimmer: 'shimmer 2s infinite linear',
+				'gradient-xy': 'gradient-xy 15s ease infinite',
+			},
+			backgroundImage: {
+				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+				'hero-pattern': 'linear-gradient(to bottom, rgba(2, 6, 23, 0.7), rgba(15, 23, 42, 0.9))',
+				'cyan-glow': 'linear-gradient(to right, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.3), rgba(0, 240, 255, 0))',
+				'card-gradient': 'linear-gradient(135deg, rgba(16, 18, 27, 0.5) 0%, rgba(23, 25, 35, 0.5) 100%)',
+				shimmer: 'linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(0, 240, 255, 0.1) 50%, rgba(255,255,255,0) 100%)',
+			},
+			boxShadow: {
+				'neon': '0 0 5px theme("colors.cyan.light"), 0 0 20px rgba(0, 240, 255, 0.3)',
+				'neon-strong': '0 0 10px theme("colors.cyan.light"), 0 0 30px rgba(0, 240, 255, 0.5)',
+				'inner-glow': 'inset 0 0 20px rgba(0, 240, 255, 0.15)',
+			},
+			dropShadow: {
+				'text-glow': '0 0 8px rgba(0, 240, 255, 0.5)',
+			},
+			backdropBlur: {
+				xs: '2px',
+			},
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
