@@ -2,12 +2,12 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Download, Github } from 'lucide-react';
+import { ArrowRight, Star, Download, Github, Cube } from 'lucide-react';
 
 const AIModels = () => {
   const models = [
     {
-      name: "StableXL",
+      name: "Flux Dev",
       type: "Image",
       description: "State-of-the-art diffusion model for photorealistic image generation",
       stats: { rating: 4.9, users: "85K+", size: "2.1GB" },
@@ -15,19 +15,27 @@ const AIModels = () => {
       isHighlighted: true,
     },
     {
-      name: "SVD-XT",
+      name: "Hunyuan",
       type: "Video",
-      description: "Stable Video Diffusion for creating smooth motion from static images",
+      description: "Advanced video synthesis system for creating smooth motion from static images",
       stats: { rating: 4.7, users: "52K+", size: "1.8GB" },
       badges: ["New", "High FPS"],
       isHighlighted: false,
     },
     {
-      name: "WhisperClone",
+      name: "Kokoro TTS",
       type: "Voice",
       description: "Fast and accurate voice cloning with minimal sample requirements",
       stats: { rating: 4.8, users: "73K+", size: "1.2GB" },
       badges: ["Fast", "Multi-lingual"],
+      isHighlighted: false,
+    },
+    {
+      name: "3D Genesis",
+      type: "3D Model",
+      description: "Cloud-based 3D model generation from text prompts and simple sketches",
+      stats: { rating: 4.6, users: "38K+", size: "N/A" },
+      badges: ["Cloud", "New"],
       isHighlighted: false,
     },
   ];
@@ -51,7 +59,7 @@ const AIModels = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {models.map((model, index) => (
             <div 
               key={model.name}
@@ -113,8 +121,17 @@ const AIModels = () => {
                   }
                   size="sm"
                 >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Model
+                  {model.type === "3D Model" ? (
+                    <>
+                      <Cube className="h-4 w-4 mr-2" />
+                      Generate Model
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Model
+                    </>
+                  )}
                 </Button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { ArrowRight, Image, Video, Mic } from 'lucide-react';
+import { ArrowRight, Image, Video, Mic, Cube } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
@@ -46,7 +46,7 @@ const Hero = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto animate-in stagger-3">
-              Create stunning images, realistic videos, and natural voice clones using state-of-the-art open source AI models — all within your browser.
+              Create stunning images, realistic videos, natural voice clones, and 3D models using state-of-the-art AI models — all within your browser.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-in stagger-4">
@@ -60,11 +60,12 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl animate-in stagger-5">
+          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-5xl animate-in stagger-5">
             {[
               { icon: Image, title: 'Image Generation', desc: 'Create photorealistic images with just text prompts' },
               { icon: Video, title: 'Video Synthesis', desc: 'Transform images into fluid, natural videos' },
-              { icon: Mic, title: 'Voice Cloning', desc: 'Clone any voice with just seconds of audio' }
+              { icon: Mic, title: 'Voice Cloning', desc: 'Clone any voice with just seconds of audio' },
+              { icon: Cube, title: '3D Model Creation', desc: 'Generate detailed 3D models from text descriptions' }
             ].map((feature, index) => (
               <div 
                 key={index} 
