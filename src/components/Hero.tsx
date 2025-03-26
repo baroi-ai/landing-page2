@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight, Image, Video, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +24,7 @@ const Hero = () => {
           playsInline
           className="object-cover w-full h-full opacity-30"
         >
-          <source src="/hero-video.mp4" type="video/mp4" />
+          <source src="https://aivideo.hunyuan.tencent.com//movie/top.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
       </div>
