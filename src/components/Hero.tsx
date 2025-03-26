@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { ArrowRight, Image, Video, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,14 +16,14 @@ const Hero = () => {
     <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
       {/* Background video */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-dark-500/80 z-10"></div>
+        <div className="absolute inset-0 bg-dark-500/60 z-10"></div>
         <video
           ref={videoRef}
           autoPlay
           muted
           loop
           playsInline
-          className="object-cover w-full h-full opacity-30"
+          className="object-cover w-full h-full opacity-50"
         >
           <source src="https://aivideo.hunyuan.tencent.com//movie/top.mp4" type="video/mp4" />
           Your browser does not support the video tag.
