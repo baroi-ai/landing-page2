@@ -1,81 +1,74 @@
-
-import React from 'react';
-import { Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import React from "react";
+// Import Link for internal navigation
+import { Link } from "react-router-dom";
+// Import specific social icons
+import { Youtube, Linkedin, Twitter } from "lucide-react";
 
 const Footer = () => {
+  // Define social links (Update hrefs later)
+  const socialLinks = [
+    { Icon: Youtube, href: "#", label: "YouTube" },
+    { Icon: Linkedin, href: "#", label: "LinkedIn" },
+    { Icon: Twitter, href: "#", label: "Twitter/X" },
+  ];
+
+  // Define navigation links (Update 'to' paths as needed)
+  const navLinks = [
+    { name: "Home", to: "/" },
+    { name: "Pricing", to: "/pricing" },
+    { name: "Contact", to: "/contact" },
+    { name: "About", to: "/about" },
+    { name: "Privacy Policy", to: "/privacy" }, // Example path
+  ];
+
   return (
-    <footer className="relative border-t border-white/10 pt-16 pb-10 overflow-hidden">
-      {/* Subtle glow at the top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-cyan-glow"></div>
-      
+    // Removed top glow div for simplicity, kept border
+    <footer className="relative border-t border-white/10 pt-12 pb-8 overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
-          <div>
-            <h3 className="text-2xl font-bold mb-4 glow-text">Glimmer AI</h3>
-            <p className="text-gray-400 mb-6">
-              Open-source AI content generation platform with no API limits or usage restrictions.
-            </p>
-            <div className="flex space-x-4">
-              {[Github, Twitter, Linkedin, Mail].map((Icon, i) => (
-                <a 
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-8">
+          {/* Left Side: Brand and Social */}
+          <div className="text-center md:text-left">
+            <h3 className="text-2xl font-bold mb-2 glow-text">Shakaal AI</h3>
+            {/* Optional short description */}
+            {/* <p className="text-gray-400 mb-4 max-w-xs">
+              Cloud-based AI content generation.
+            </p> */}
+            <div className="flex justify-center md:justify-start space-x-4">
+              {socialLinks.map(({ Icon, href, label }, i) => (
+                <a
                   key={i}
-                  href="#" 
-                  className="w-10 h-10 rounded-full bg-dark-400/50 flex items-center justify-center text-gray-400 hover:text-cyan-light hover:bg-dark-400 transition-colors"
+                  href={href}
+                  target="_blank" // Open social links in new tab
+                  rel="noopener noreferrer"
+                  aria-label={label} // Accessibility
+                  className="w-9 h-9 rounded-full bg-dark-400/50 flex items-center justify-center text-gray-400 hover:text-cyan-light hover:bg-dark-400 transition-colors"
                 >
                   <Icon className="h-5 w-5" />
                 </a>
               ))}
             </div>
           </div>
-          
-          <div>
-            <h4 className="font-medium text-lg mb-4">Platform</h4>
-            <ul className="space-y-3 text-gray-400">
-              {['Features', 'AI Models', 'Documentation', 'Pricing', 'Examples'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="hover:text-cyan-light link-underline">
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-medium text-lg mb-4">Resources</h4>
-            <ul className="space-y-3 text-gray-400">
-              {['Blog', 'Community', 'GitHub', 'Roadmap', 'Changelog'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="hover:text-cyan-light link-underline">
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-medium text-lg mb-4">Company</h4>
-            <ul className="space-y-3 text-gray-400">
-              {['About Us', 'Careers', 'Contact', 'Privacy Policy', 'Terms of Service'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="hover:text-cyan-light link-underline">
-                    {item}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
+
+          {/* Right Side: Navigation Links (Only on larger screens might look better) */}
+          {/* This part is removed based on the simplification, links moved to bottom */}
         </div>
-        
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center">
+
+        {/* Bottom Row: Copyright and Condensed Links */}
+        <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            © {new Date().getFullYear()} Glimmer AI. All rights reserved.
+            © {new Date().getFullYear()} Baroi AI. All rights reserved.
           </p>
-          <div className="flex space-x-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-gray-300">Privacy</a>
-            <a href="#" className="hover:text-gray-300">Terms</a>
-            <a href="#" className="hover:text-gray-300">Cookies</a>
+          {/* Condensed Navigation Links */}
+          <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-x-6 text-sm text-gray-500">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.to}
+                className="hover:text-gray-300 transition-colors"
+              >
+                {link.name}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

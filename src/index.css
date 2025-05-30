@@ -1,51 +1,50 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
   :root {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
- 
+
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
- 
+
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
- 
+
     --primary: 180 91% 50%;
     --primary-foreground: 222.2 47.4% 11.2%;
- 
+
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
- 
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
- 
+
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
- 
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
- 
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 180 91% 50%;
- 
+
     --radius: 0.75rem;
   }
 }
- 
+
 @layer base {
   * {
     @apply border-border;
   }
-  
+
   html {
     @apply scroll-smooth antialiased;
   }
-  
+
   body {
     @apply bg-dark-300 text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -150,3 +149,31 @@
 .link-underline {
   @apply relative after:absolute after:bottom-0 after:left-0 after:h-[1px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-cyan after:transition-transform after:duration-300 after:ease-in-out hover:after:origin-bottom-left hover:after:scale-x-100;
 }
+
+
+/* src/index.css or src/globals.css */
+
+/* ... other global styles ... */
+
+.my-masonry-grid {
+  display: flex;
+  margin-left: -16px;
+  /* Adjust based on your desired gap = negative px value below */
+  width: auto;
+}
+
+.my-masonry-grid_column {
+  padding-left: 16px;
+  /* Gutter size / Column gap */
+  background-clip: padding-box;
+  /* Important! */
+}
+
+/* Style your items */
+.my-masonry-grid_column>div {
+  /* Style items inside columns - you style card directly with Tailwind */
+  margin-bottom: 16px;
+  /* Vertical gap between items */
+}
+
+/* Optional: Responsive adjustments in CSS if needed, though breakpoints are handled in JS */
