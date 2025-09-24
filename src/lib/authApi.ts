@@ -3,7 +3,9 @@
 import { toast } from "sonner";
 // import { router } from 'next/router'; // Or your routing mechanism if needed for redirect
 
-const BASE_URL = "http://127.0.0.1:8000/api"; // Your Django API base URL
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 
 async function refreshToken(): Promise<string | null> { // Added return type
     const currentRefreshToken = localStorage.getItem("refresh");

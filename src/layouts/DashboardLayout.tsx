@@ -1,85 +1,123 @@
-// src/layouts/DashboardLayout.tsx
-
-import React, { useState, useEffect } from "react"; // Import useEffect
+import React, { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import { cn } from "@/lib/utils";
 
+import AnnouncementBanner from "./AnnouncementBanner";
+import type { BannerType } from "./AnnouncementBanner";
+import { publicApiGet } from "@/lib/api";
+
+// Define the shape of the data from the API
+interface AnnouncementData {
+  id: number;
+  message: string;
+  type: BannerType;
+  link?: string;
+  link_text?: string;
+}
+
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-// Define your video sources
-const DESKTOP_VIDEO_SRC = "/bg3.mp4"; // Your main background video
-const MOBILE_VIDEO_SRC = "/bgs.mp4"; // Your specific mobile background video
-const MOBILE_BREAKPOINT = 768; // Tailwind's `md` breakpoint
+// ✅ 1. Define video sources and poster in a structured way
+const videoSources = {
+  desktop: {
+    webm: "/videos/hero-background.webm",
+    mp4: "/videos/hero-background.mp4",
+  },
+  mobile: {
+    webm: "/videos/hero-background-mobile.webm",
+    mp4: "/videos/hero-background-mobile.mp4",
+  },
+};
+const POSTER_IMAGE = "/videos/hero-poster.webp";
+const MOBILE_BREAKPOINT = 768;
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false); // To prevent layout shift or flicker
-  const [currentVideoSrc, setCurrentVideoSrc] = useState(DESKTOP_VIDEO_SRC);
+  // Default to desktop sources to prevent flash of content on initial render
+  const [currentVideoSources, setCurrentVideoSources] = useState(
+    videoSources.desktop
+  );
+  // This state is primarily to ensure client-side logic has run
+  const [isClient, setIsClient] = useState(false);
 
+  const [announcement, setAnnouncement] = useState<AnnouncementData | null>(
+    null
+  );
+  const [isLoadingAnnouncement, setIsLoadingAnnouncement] = useState(true);
+
+  // Effect for setting the correct video source based on screen size
   useEffect(() => {
     const checkScreenSize = () => {
       const isMobile = window.innerWidth < MOBILE_BREAKPOINT;
-      setCurrentVideoSrc(isMobile ? MOBILE_VIDEO_SRC : DESKTOP_VIDEO_SRC);
-      setIsVideoReady(true); // Mark video as ready after first check
+      setCurrentVideoSources(
+        isMobile ? videoSources.mobile : videoSources.desktop
+      );
     };
 
-    // Initial check
+    // Run on initial mount (client-side only)
     checkScreenSize();
+    setIsClient(true); // Mark that client-side logic has run
 
-    // Listener for window resize
     window.addEventListener("resize", checkScreenSize);
-
-    // Cleanup listener
     return () => window.removeEventListener("resize", checkScreenSize);
-  }, []); // Empty dependency array ensures this runs once on mount and cleans up on unmount
+  }, []);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  // Effect for fetching announcement data
+  useEffect(() => {
+    const fetchActiveAnnouncement = async () => {
+      try {
+        const data = await publicApiGet("/api/announcements/active");
+        if (data) {
+          setAnnouncement(data);
+        }
+      } catch (error) {
+        console.error("Could not fetch active announcement:", error);
+      } finally {
+        setIsLoadingAnnouncement(false);
+      }
+    };
+    fetchActiveAnnouncement();
+  }, []);
 
-  const closeSidebar = () => {
-    setIsSidebarOpen(false);
-  };
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
     <div className={cn("flex h-screen text-foreground relative")}>
-      {/* --- Background Video Layer --- */}
-      {isVideoReady && ( // Conditionally render video element once src is determined
-        <div
-          className="fixed inset-0 z-[-2] overflow-hidden pointer-events-none"
-          aria-hidden="true"
+      {/* --- Background Video Layer (OPTIMIZED) --- */}
+      <div
+        className="fixed inset-0 z-[-2] overflow-hidden pointer-events-none"
+        aria-hidden="true"
+      >
+        {/* The key forces a re-mount when the source changes between mobile/desktop */}
+        <video
+          key={isClient ? currentVideoSources.mp4 : "initial"}
+          autoPlay
+          loop
+          muted
+          playsInline
+          // ✅ 2. The poster provides an instant background, improving LCP
+          poster={POSTER_IMAGE}
+          className="w-full h-full object-cover"
         >
-          <video
-            key={currentVideoSrc} // Add key to force re-render if src changes
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source
-              src={currentVideoSrc} // Use dynamic video source
-              type="video/mp4"
-            />
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      )}
+          {/* ✅ 3. Provide modern WebM format with MP4 as a fallback */}
+          <source src={currentVideoSources.webm} type="video/webm" />
+          <source src={currentVideoSources.mp4} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
-      {/* --- Background Overlay Layer --- */}
       <div
         className="fixed inset-0 z-[-1] bg-black/70 pointer-events-none"
         aria-hidden="true"
       ></div>
 
-      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
 
-      {/* Overlay for mobile sidebar */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 md:hidden"
@@ -88,22 +126,28 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* Main content area container */}
       <div className="flex flex-1 flex-col overflow-hidden z-10">
-        {/* Dashboard-specific Navbar */}
+        {!isLoadingAnnouncement && announcement && (
+          <AnnouncementBanner
+            id={`server-announcement-${announcement.id}`}
+            type={announcement.type}
+            message={announcement.message}
+            link={announcement.link}
+            linkText={announcement.link_text}
+          />
+        )}
+
         <DashboardNavbar toggleSidebar={toggleSidebar} />
 
-        {/* Page content */}
         <main
           className={cn(
             "flex-1 overflow-y-auto p-4 md:p-6 lg:p-8",
-            "pb-20 md:pb-6 lg:pb-8" // Adjust padding-bottom for mobile nav
+            "pb-20 md:pb-6 lg:pb-8"
           )}
         >
           {children}
         </main>
 
-        {/* Mobile Bottom Nav */}
         <MobileBottomNav />
       </div>
     </div>

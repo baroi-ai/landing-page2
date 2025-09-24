@@ -1,13 +1,16 @@
-// src/components/PrivateRoute.tsx
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useAuth } from "./AuthContext";
 
 const PrivateRoute = () => {
-  // Check if user is logged in by verifying if an access token exists.
-  // You can modify this to check your auth context or redux state if needed.
-  const isAuthenticated = localStorage.getItem("access");
+  const { isAuthenticated } = useAuth(); // 👈 Use the context state
+  const location = useLocation();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default PrivateRoute;

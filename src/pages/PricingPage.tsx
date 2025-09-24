@@ -1,6 +1,6 @@
-// src/pages/PricingPage.tsx (or your preferred path)
+// src/pages/PricingPage.tsx
 
-import React from "react";
+import React, { useState, useEffect } from "react"; // Added useEffect for custom top-up calculation
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -13,73 +13,106 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-// --- Import Accordion Components ---
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-// --- End Import ---
-import { Check, Coins } from "lucide-react";
+import { Input } from "@/components/ui/input"; // Import Input
+import { Check, Coins, Zap } from "lucide-react"; // Import Zap for Top-Up section
+import { useNavigate } from "react-router-dom";
 
-// Define the structure for a pricing plan (Keep as before)
-interface PricingPlan {
+// --- Data Structures ---
+interface SubscriptionPlanBase {
+  idPrefix: string;
+  name: string;
+  baseCoins: number;
+  monthlyPriceDecimal: number;
+  yearlyPriceDecimal: number;
+  currency: string;
+  description: string;
+  features: string[];
+  isHighlighted?: boolean;
+}
+
+interface DisplayPlan {
   name: string;
   coins: number;
   price: string;
   description: string;
   features: string[];
   isHighlighted?: boolean;
-  buttonText?: string;
+  buttonText: string;
+  id: string;
 }
 
-const pricingPlans: PricingPlan[] = [
-  // ... (Keep pricingPlans array as defined previously)
+const subscriptionPlanBases: SubscriptionPlanBase[] = [
   {
-    name: "Starter Pack",
-    coins: 100,
-    price: "$5",
-    description: "Perfect for trying out basic features.",
+    idPrefix: "starter_sub",
+    name: "Starter Subscription",
+    baseCoins: 150,
+    monthlyPriceDecimal: 7.0,
+    yearlyPriceDecimal: 70.0,
+    currency: "USD",
+    description: "Consistent automatic coin top-up.",
     features: [
-      "Generate up to 20 images",
-      "Basic voice cloning attempts",
-      "Standard queue priority",
+      "Automatic coin refills",
+      "Cancel anytime",
+      "Best image generation",
+      "150 images via Minimax Image-01",
     ],
-    buttonText: "Get 100 Coins",
   },
   {
-    name: "Value Pack",
-    coins: 500,
-    price: "$20", // Example price (adjust as needed)
-    description: "Best value for regular users.",
+    idPrefix: "value_sub",
+    name: "Value Subscription",
+    baseCoins: 750,
+    monthlyPriceDecimal: 28.0,
+    yearlyPriceDecimal: 280.0,
+    currency: "USD",
+    description: "Best value for regular creators.",
     features: [
-      "Generate up to 120 images",
-      "Multiple voice cloning slots",
+      "Automatic coin refills",
       "Access to premium models",
       "Faster queue priority",
-      "Early access to new features",
+      "Cancel anytime",
     ],
-    isHighlighted: true, // Mark this as the popular choice
-    buttonText: "Get 500 Coins",
+    isHighlighted: true,
   },
   {
-    name: "Pro Pack",
-    coins: 1000,
-    price: "$35", // Example price (adjust as needed)
-    description: "For heavy users and professionals.",
+    idPrefix: "pro_sub",
+    name: "Pro Subscription",
+    baseCoins: 1500,
+    monthlyPriceDecimal: 49.0,
+    yearlyPriceDecimal: 490.0,
+    currency: "USD",
+    description: "Max coins & priority for power users.",
     features: [
-      "Generate up to 300 images",
-      "Unlimited voice cloning",
-      "Access all premium models",
-      "Highest queue priority",
-      "Dedicated support channel",
+      "Automatic coin refills",
+      "Cancel anytime",
+      "Best for video generation.",
+      "40 videos via Hunyuan Video",
     ],
-    buttonText: "Get 1000 Coins",
   },
 ];
 
-// --- FAQ Data ---
+const pricingPlans: DisplayPlan[] = subscriptionPlanBases.map((base) => ({
+  id: `${base.idPrefix}_monthly_display`,
+  name: base.name,
+  coins: base.baseCoins,
+  price: `$${base.monthlyPriceDecimal.toFixed(2)}/month`,
+  description: base.description,
+  features: base.features,
+  isHighlighted: base.isHighlighted,
+  buttonText: `Get ${base.name}`,
+}));
+
+const allDisplayPlans: DisplayPlan[] = [...pricingPlans];
+
+// --- Constants for Top-Up ---
+const COINS_PER_DOLLAR = 20; // Same as BillingPage
+const MIN_CUSTOM_TOP_UP_USD = 5; // Same as BillingPage
+
 const faqs = [
   {
     question: "How do I use coins?",
@@ -89,17 +122,17 @@ const faqs = [
   {
     question: "Do the coins expire?",
     answer:
-      "No, purchased coins do not expire. You can use them whenever you need them.",
+      "No, purchased coins or subscribed coins do not expire as long as your subscription is active. One-time purchase coins never expire.",
   },
   {
     question: "What payment methods do you accept?",
     answer:
-      "We accept major credit cards (Visa, Mastercard, American Express) and PayPal for purchasing coin packs.",
+      "We accept major credit cards (Visa, Mastercard, American Express) and PayPal for purchasing coin packs and subscriptions. You will be prompted to log in or create an account to complete your purchase.",
   },
   {
-    question: "Can I get a refund for unused coins?",
+    question: "Can I get a refund?",
     answer:
-      "Coin pack purchases are generally non-refundable. Please refer to our Terms of Service for detailed information on our refund policy.",
+      "Coin pack purchases and subscription payments are generally non-refundable. Please refer to our Terms of Service for detailed information on our refund policy.",
   },
   {
     question: "How is coin usage calculated for different features?",
@@ -107,50 +140,57 @@ const faqs = [
       "Coin costs vary depending on the complexity and computational resources required for each generation. For example, generating a high-resolution image might cost more coins than a standard voice clone. Costs are displayed upfront.",
   },
 ];
-// --- End FAQ Data ---
 
 const PricingPage = () => {
+  const navigate = useNavigate();
+  const [customTopUpAmountUSD, setCustomTopUpAmountUSD] = useState<string>("");
+  const [calculatedCustomCoins, setCalculatedCustomCoins] = useState<number>(0);
+
+  useEffect(() => {
+    const amount = parseFloat(customTopUpAmountUSD);
+    if (!isNaN(amount) && amount >= 0.01) {
+      setCalculatedCustomCoins(Math.floor(amount * COINS_PER_DOLLAR));
+    } else {
+      setCalculatedCustomCoins(0);
+    }
+  }, [customTopUpAmountUSD]);
+
+  const handleGetPlanOrTopUp = () => {
+    navigate("/login");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-dark-500 text-white overflow-x-hidden">
       <Navbar />
-
-      {/* Gradient Overlay */}
       <div className="absolute inset-0 hero-gradient z-0"></div>
-
-      {/* Content Area */}
       <main className="flex-grow flex flex-col items-center px-4 py-16 sm:py-24 relative z-10">
-        {" "}
-        {/* Removed justify-center */}
-        {/* Header Section */}
-        <div className="text-center mb-12 max-w-2xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Choose Your Coin Pack
+        <div className="text-center mb-12 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+            Flexible Plans for Every Creator
           </h1>
-          <p className="text-lg text-gray-300">
-            Select the right amount of coins for your creative needs. Use coins
-            for generating images, videos, voices, and more.
+          <p className="text-lg md:text-xl text-gray-300">
+            Choose a recurring subscription for continuous coins or grab a
+            one-time coin pack. All purchases require login.
           </p>
         </div>
-        {/* Pricing Grid */}
+
+        {/* Subscription Plans Grid */}
         <div className="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {" "}
-          {/* Added mb-16 */}
-          {pricingPlans.map((plan) => (
-            // --- Pricing Card (Keep as before) ---
+          {allDisplayPlans.map((plan) => (
             <Card
-              key={plan.name}
+              key={plan.id}
               className={`flex flex-col bg-transparent text-white shadow-lg backdrop-blur-md border ${
                 plan.isHighlighted
-                  ? "border-cyan-500 ring-2 ring-cyan-500/50 relative"
+                  ? "border-teal-500 ring-2 ring-cyan-500/50 relative"
                   : "border-white/20"
               }`}
             >
               {plan.isHighlighted && (
                 <Badge
                   variant="default"
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 bg-cyan text-dark-500 px-3 py-1 text-sm font-semibold"
+                  className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black px-3 py-1 text-sm font-semibold"
                 >
-                  Most Popular
+                  Best Value
                 </Badge>
               )}
               <CardHeader className="pt-8 pb-4 text-center">
@@ -159,9 +199,11 @@ const PricingPage = () => {
                 </CardTitle>
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <Coins className="h-7 w-7 text-cyan-400" />
-                  <span className="text-3xl font-bold">{plan.coins}</span>
+                  <span className="text-3xl font-bold">
+                    {plan.coins.toLocaleString()}
+                  </span>
                 </div>
-                <CardDescription className="text-gray-300 h-10">
+                <CardDescription className="text-gray-300 h-10 min-h-[2.5rem]">
                   {plan.description}
                 </CardDescription>
               </CardHeader>
@@ -180,46 +222,117 @@ const PricingPage = () => {
               </CardContent>
               <CardFooter className="p-6 pt-0">
                 <Button
-                  className={`w-full text-lg py-3 ${
+                  onClick={handleGetPlanOrTopUp}
+                  className={`w-full text-lg py-3 font-semibold ${
                     plan.isHighlighted
-                      ? "bg-cyan text-dark-500 hover:bg-cyan-500"
+                      ? "bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black"
                       : "bg-white/10 border border-white/30 text-white hover:bg-white/20"
                   }`}
                 >
-                  {plan.buttonText || `Get ${plan.coins} Coins`}
+                  {plan.buttonText}
                 </Button>
               </CardFooter>
             </Card>
-            // --- End Pricing Card ---
           ))}
         </div>
-        {/* Coin Info Text */}
-        <div className="mb-16 text-center text-gray-400 max-w-xl mx-auto">
+
+        {/* --- Coin Top-Up Section (Copied and adapted from BillingPage) --- */}
+        <section className="w-full max-w-5xl mx-auto mt-0 mb-16">
           {" "}
-          {/* Added mb-16 */}
+          {/* Adjusted mt-0 mb-16 */}
+          <div className="flex flex-col items-center mb-8">
+            <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 flex items-center gap-2">
+              {" "}
+              {/* Matched heading size */}
+              <Zap className="h-7 w-7 text-teal-400" />
+              One-Time Coin Top-Up
+            </h2>
+            <p className="text-muted-foreground text-center max-w-md">
+              Need a specific amount? Get {COINS_PER_DOLLAR} coins per $1
+              (minimum ${MIN_CUSTOM_TOP_UP_USD} purchase). Login to complete
+              purchase.
+            </p>
+          </div>
+          <Card className="w-full max-w-lg mx-auto bg-transparent text-white shadow-lg backdrop-blur-md border border-white/20 p-6 md:p-8">
+            <CardHeader className="p-0 pb-4">
+              <CardTitle className="text-xl text-center">
+                Enter Top-Up Amount (USD)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0 pb-4 space-y-4">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+                  $
+                </span>
+                <Input
+                  id="custom-amount-usd-pricingpage" // Unique ID
+                  type="number"
+                  placeholder={`${MIN_CUSTOM_TOP_UP_USD}`}
+                  value={customTopUpAmountUSD}
+                  onChange={(e) => setCustomTopUpAmountUSD(e.target.value)}
+                  className="bg-dark-700 bg-transparent border-dark-400 h-12 text-lg pl-7 pr-4 focus:ring-teal-500 focus:border-teal-500"
+                  min={MIN_CUSTOM_TOP_UP_USD.toString()}
+                  step="1"
+                />
+              </div>
+              {calculatedCustomCoins > 0 &&
+                parseFloat(customTopUpAmountUSD) >= MIN_CUSTOM_TOP_UP_USD && (
+                  <p className="text-center text-lg text-cyan-400">
+                    You'll get approximately: {/* Changed wording slightly */}
+                    <strong className="font-bold">
+                      {calculatedCustomCoins.toLocaleString()}
+                    </strong>{" "}
+                    Coins
+                  </p>
+                )}
+              {parseFloat(customTopUpAmountUSD) > 0 &&
+                parseFloat(customTopUpAmountUSD) < MIN_CUSTOM_TOP_UP_USD && (
+                  <p className="text-center text-sm text-yellow-400">
+                    Minimum top-up is ${MIN_CUSTOM_TOP_UP_USD}.
+                  </p>
+                )}
+            </CardContent>
+            <CardFooter className="p-0 flex flex-col items-center">
+              <Button
+                onClick={handleGetPlanOrTopUp} // Re-use the same handler
+                disabled={
+                  parseFloat(customTopUpAmountUSD) < MIN_CUSTOM_TOP_UP_USD ||
+                  isNaN(parseFloat(customTopUpAmountUSD))
+                }
+                className="w-full text-lg py-3 font-semibold bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black"
+              >
+                Top-Up{" "}
+                {calculatedCustomCoins > 0 &&
+                parseFloat(customTopUpAmountUSD) >= MIN_CUSTOM_TOP_UP_USD
+                  ? `${calculatedCustomCoins.toLocaleString()} Coins`
+                  : "Now"}
+              </Button>
+            </CardFooter>
+          </Card>
+        </section>
+        {/* --- End Coin Top-Up Section --- */}
+
+        <div className="mb-16 text-center text-gray-400 max-w-xl mx-auto">
           <p>
             Coins can be used across all Shakaal AI generation tools. Unused
-            coins do not expire.
+            coins do not expire. Login required for all purchases.
           </p>
         </div>
-        {/* --- FAQ Section --- */}
+
         <div className="w-full max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-8">
             Frequently Asked Questions
           </h2>
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq, index) => (
-              // Use border/bg consistent with the card style
               <AccordionItem
                 key={index}
                 value={`item-${index}`}
-                className="bg-transparent border border-white/20 rounded-lg mb-3 backdrop-blur-md overflow-hidden" // Added backdrop-blur, overflow-hidden, margin
+                className="bg-transparent border border-white/20 rounded-lg mb-3 backdrop-blur-md overflow-hidden"
               >
-                {/* Ensure trigger text is white/readable */}
                 <AccordionTrigger className="px-6 py-4 text-left text-lg hover:no-underline text-white font-medium">
                   {faq.question}
                 </AccordionTrigger>
-                {/* Ensure content text is light gray/readable */}
                 <AccordionContent className="px-6 pb-4 text-gray-300">
                   {faq.answer}
                 </AccordionContent>
@@ -227,7 +340,6 @@ const PricingPage = () => {
             ))}
           </Accordion>
         </div>
-        {/* --- End FAQ Section --- */}
       </main>
 
       <Footer />

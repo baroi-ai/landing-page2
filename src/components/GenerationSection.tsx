@@ -147,7 +147,6 @@ const GenerationSection = () => {
                     </button>
                   </div>
                 </div>
-
                 {/* --- Image Tab --- */}
                 <TabsContent value="image" className="mt-0">
                   <div className="grid md:grid-cols-2 gap-6">
@@ -277,9 +276,8 @@ const GenerationSection = () => {
                     {/* --- End Updated Image Display Area --- */}
                   </div>
                 </TabsContent>
-
-                {/* Other TabsContent (Video, Voice, 3D) remain the same */}
-                {/* ... (Video Tab) ... */}
+                {/* Other TabsContent (Video, Voice, 3D) remain the same */}{" "}
+                {/* Video Tab */}
                 <TabsContent value="video" className="mt-0">
                   <div className="text-center py-12 max-w-md mx-auto">
                     <Video className="h-16 w-16 text-gray-500 opacity-50 mx-auto mb-4" />

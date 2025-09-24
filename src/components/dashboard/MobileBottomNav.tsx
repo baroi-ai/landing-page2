@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 // Corrected Label for root dashboard
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-  { href: "/dashboard/explore", label: "Models", icon: Atom },
+  { href: "/dashboard/billing", label: "Billings", icon: CreditCard },
   { href: "/dashboard/generations", label: "Assets", icon: FolderCheck },
   { href: "/dashboard/profile", label: "Profile", icon: User },
 ];
@@ -28,7 +28,7 @@ const createOptions = [
   { href: "/dashboard/generate/image", label: "Image", icon: ImageIcon },
   { href: "/dashboard/generate/video", label: "Video", icon: Video },
   { href: "/dashboard/generate/voice", label: "Voice", icon: AudioLines },
-  { href: "/dashboard", label: "More", icon: Dices },
+  { href: "/dashboard/tools", label: "More", icon: Dices },
 ];
 
 const MobileBottomNav: React.FC = () => {

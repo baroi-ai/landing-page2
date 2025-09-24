@@ -29,7 +29,7 @@ const NotFound = () => {
     <div className="min-h-screen flex items-center justify-center bg-dark-500 text-gray-100 px-4">
       <div className="text-center max-w-md w-full">
         {/* Large, prominent 404 heading with optional glow */}
-        <h1 className="text-8xl md:text-9xl font-bold mb-4 text-white glow-text">
+        <h1 className="text-8xl md:text-9xl font-bold text-teal-500 mb-4 glow-text">
           404
         </h1>
 
@@ -45,9 +45,9 @@ const NotFound = () => {
         {/* Link back home using the cyan theme color */}
         <Link
           to="/" // Use Link for client-side routing
-          className="inline-flex items-center px-6 py-3 bg-cyan-600 hover:bg-cyan-700 text-white font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-dark-500" // Added focus styles
+          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-dark-500" // Added focus styles
         >
-          <Home className="mr-2 h-5 w-5" /> {/* Optional Icon */}
+          <Home className="mr-2 h-5 w-5 " /> {/* Optional Icon */}
           Return to Home
         </Link>
       </div>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react"; // Added hooks
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Link, useNavigate } from "react-router-dom"; // Added useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowRight,
   Star,
@@ -11,13 +11,13 @@ import {
   ImagePlus,
   LinkIcon,
   Search,
-  Loader2, // Added loader
-  AlertTriangle, // Added error icon
+  Loader2,
+  AlertTriangle,
 } from "lucide-react";
 
-// --- Interfaces (APIModel, DisplayModel - Copied from ExplorerPage) ---
+// --- Interfaces ---
 interface APIModel {
-  id: number; // Expect number ID from API
+  id: number;
   icon: string | null;
   name: string;
   model_type: string;
@@ -34,7 +34,7 @@ interface DisplayModel extends APIModel {
   typeIconKey: keyof typeof typeIconComponents;
 }
 
-// --- Helper Map for Small Icons (Copied from ExplorerPage) ---
+// --- Helper Maps & Functions ---
 const typeIconComponents = {
   image: ImagePlus,
   video: Video,
@@ -46,7 +46,6 @@ const typeIconComponents = {
   default: LinkIcon,
 };
 
-// --- Helper Function to Map API data (Copied from ExplorerPage) ---
 const mapApiToDisplayModel = (apiModel: APIModel): DisplayModel => {
   const modelTypeLower = apiModel.model_type?.toLowerCase() || "default";
   let typeIconKey: keyof typeof typeIconComponents = "default";
@@ -68,36 +67,36 @@ const mapApiToDisplayModel = (apiModel: APIModel): DisplayModel => {
 
 // --- Component ---
 const AIModels = () => {
-  // --- State Variables ---
-  const [displayModels, setDisplayModels] = useState<DisplayModel[]>([]); // Models to display
+  const [displayModels, setDisplayModels] = useState<DisplayModel[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  // --- Fetch Data ---
+  // Get the base URL from the environment variables
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchFeaturedModels = async () => {
       setIsLoading(true);
       setError(null);
+      if (!API_BASE_URL) {
+        setError(
+          "API base URL is not configured. Please check your .env file."
+        );
+        setIsLoading(false);
+        return;
+      }
       try {
-        // Fetch from the same endpoint as the explorer page
-        const response = await fetch("http://127.0.0.1:8000/api/ai-models/");
+        // Use the environment variable for the API call
+        const response = await fetch(`${API_BASE_URL}/api/ai-models`);
         if (!response.ok) {
           throw new Error(
             `HTTP error! status: ${response.status} ${response.statusText}`
           );
         }
         const allApiData: APIModel[] = await response.json();
-
-        // Map all fetched data
         const allMappedData = allApiData.map(mapApiToDisplayModel);
-
-        // --- Select Featured Models (e.g., first 4) ---
-        // Ideally, your API would have an endpoint like /api/ai-models/featured/
-        // If not, slice the results here.
         const featuredModels = allMappedData.slice(0, 4);
-        // --- End Selection ---
-
         setDisplayModels(featuredModels);
       } catch (err) {
         console.error("Failed to fetch AI models for section:", err);
@@ -110,26 +109,20 @@ const AIModels = () => {
     };
 
     fetchFeaturedModels();
-  }, []); // Empty dependency array runs once on mount
+  }, [API_BASE_URL]); // Add API_BASE_URL as a dependency
 
-  // --- Handle Action Button Click (Navigation) ---
   const handleActionClick = (link: string | undefined) => {
     if (link && link !== "#") {
-      // Added check for '#'
       console.log(`AIModels component navigating to: ${link}`);
       navigate(link);
     } else {
       console.warn(`Action link is invalid or not defined: ${link}`);
-      // Optionally show a message like "Coming soon" or do nothing
       alert("This model's page is not available yet.");
     }
   };
 
   return (
     <section id="ai-models" className="py-24 relative overflow-hidden">
-      {" "}
-      {/* Corrected id */}
-      {/* Background gradients */}
       <div className="absolute inset-0 hero-gradient z-10"></div>
       <div className="absolute -top-40 -left-40 w-80 h-80 bg-cyan/10 rounded-full blur-3xl opacity-30"></div>
       <div className="absolute -bottom-40 -right-40 w-80 h-80 bg-cyan/5 rounded-full blur-3xl opacity-20"></div>
@@ -149,8 +142,6 @@ const AIModels = () => {
         </div>
         {/* --- Content Area (Loading, Error, Grid) --- */}
         <div className="min-h-[300px]">
-          {" "}
-          {/* Added min-height to prevent collapsing during load */}
           {isLoading && (
             <div className="flex justify-center items-center pt-10">
               <Loader2 className="h-10 w-10 animate-spin text-cyan" />
@@ -175,20 +166,21 @@ const AIModels = () => {
                   border-cyan-400/50 shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20
                   hover:border-cyan-500/70`;
 
+                const imageUrl = `${model.icon}`;
+                console.log("Generated Image URL:", imageUrl);
+
                 return (
-                  // Card structure copied from previous version, using fetched data
                   <div key={model.id} className={cardClasses}>
                     {/* Logo Area */}
                     <div className="relative h-24 flex justify-center items-center border-b border-cyan-200/30">
                       {model.icon ? (
                         <img
-                          src={model.icon} // Use API icon URL
+                          // ✅ *** THE FIX IS HERE *** ✅
+                          src={`${model.icon}`}
                           alt={`${model.name} Logo`}
                           className="max-h-16 max-w-full object-contain rounded-sm p-1"
                           onError={(e) => {
-                            e.currentTarget.src = ""; // Clear src on error
-                            e.currentTarget.style.display = "none"; // Hide img
-                            // Optionally display fallback initials container here
+                            e.currentTarget.style.display = "none";
                             const parent = e.currentTarget.parentElement;
                             if (parent) {
                               const fallback =
@@ -199,14 +191,15 @@ const AIModels = () => {
                             }
                           }}
                         />
-                      ) : null}{" "}
-                      {/* Render img only if icon exists */}
-                      {/* Fallback Initials Container (initially hidden if logo exists) */}
-                      {!model.icon && ( // Render fallback if no logo URL
-                        <div className="fallback-initials h-12 w-12 rounded-md bg-gradient-to-br from-cyan-700 to-blue-800 flex items-center justify-center text-white text-xl font-semibold">
-                          {model.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                      ) : null}
+                      {/* Fallback displayed if model.icon is null OR if img errors */}
+                      <div
+                        className={`fallback-initials h-12 w-12 rounded-md bg-gradient-to-br from-cyan-700 to-teal-800 items-center justify-center text-white text-xl font-semibold ${
+                          model.icon ? "hidden" : "flex"
+                        }`}
+                      >
+                        {model.name.charAt(0).toUpperCase()}
+                      </div>
                     </div>
 
                     {/* Card Content Below Logo */}
@@ -231,7 +224,6 @@ const AIModels = () => {
                         {model.description}
                       </p>
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {/* Use displayBadges from mapped data */}
                         {model.displayBadges.map((badge) => (
                           <span
                             key={badge}
@@ -245,7 +237,6 @@ const AIModels = () => {
 
                     {/* Card Footer */}
                     <div className="p-4 flex justify-between items-center gap-3 border-t bg-black/20 border-cyan-600/30">
-                      {/* GitHub Button */}
                       {model.github ? (
                         <a
                           href={model.github}
@@ -273,11 +264,10 @@ const AIModels = () => {
                           <Github className="h-5 w-5" />
                         </Button>
                       )}
-                      {/* Action Button - Calls handleActionClick */}
                       <Button
-                        className="w-full bg-cyan hover:bg-cyan-dark text-black font-semibold btn-glow transition-colors duration-200"
+                        className="w-full bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black font-semibold btn-glow transition-colors duration-200"
                         size="sm"
-                        onClick={() => handleActionClick(model.link)} // Use navigation handler
+                        onClick={() => handleActionClick(model.link)}
                       >
                         <TypeIconComponent className="h-4 w-4 mr-2" />
                         {model.actiontext}
@@ -293,13 +283,9 @@ const AIModels = () => {
               <p>No featured models available at the moment.</p>
             </div>
           )}
-        </div>{" "}
-        {/* End Content Area */}
-        {/* Browse All Button */}
+        </div>
         <div className="text-center mt-16">
-          <Link to="/ai-models">
-            {" "}
-            {/* Ensure this links to your explorer page */}
+          <Link to="/dashboard/models">
             <Button
               variant="outline"
               className="border-cyan/30 hover:border-cyan-light hover-glow"
