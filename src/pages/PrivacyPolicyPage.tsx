@@ -9,7 +9,7 @@ const PrivacyPolicyPage = () => {
   const pageTitle = "Privacy Policy | Deepshark AI";
   const pageDescription =
     "Understand how Deepshark AI collects, uses, and protects your personal data when you use our services.";
-  const canonicalUrl = "https://sharkyai.xyz/privacy-policy";
+  const canonicalUrl = "https://deepsharkai.art/privacy-policy";
 
   return (
     <div className="flex flex-col min-h-screen bg-dark-500 text-gray-300">

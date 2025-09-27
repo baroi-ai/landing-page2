@@ -9,7 +9,7 @@ const RefundPolicyPage = () => {
   const pageTitle = "Refund Policy | Deepshark AI";
   const pageDescription =
     "Review the refund and cancellation policy for credit purchases and subscriptions on the Deepshark AI platform.";
-  const canonicalUrl = "https://sharkyai.xyz/refund-policy";
+  const canonicalUrl = "https://deepsharkai.art/refund-policy";
 
   return (
     <div className="flex flex-col min-h-screen bg-dark-500 text-gray-300">

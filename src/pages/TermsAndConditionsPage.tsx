@@ -9,7 +9,7 @@ const TermsAndConditionsPage = () => {
   const pageTitle = "Terms and Conditions | Deepshark AI";
   const pageDescription =
     "Read the terms and conditions for using the Deepshark AI platform and services.";
-  const canonicalUrl = "https://sharkyai.xyz/terms";
+  const canonicalUrl = "https://deepsharkai.art/terms";
 
   return (
     <div className="flex flex-col min-h-screen bg-dark-500 text-gray-300">
@@ -31,9 +31,9 @@ const TermsAndConditionsPage = () => {
           <div className="prose prose-invert prose-lg max-w-none space-y-6">
             <p>
               Please read these Terms and Conditions ("Terms") carefully before
-              using the https://sharkyai.xyz/ website (the "Service") operated
-              by Subhodeep Baroi, doing business as Shakaal AI ("us", "we", or
-              "our").
+              using the https://deepsharkai.art/ website (the "Service")
+              operated by Subhodeep Baroi, doing business as Shakaal AI ("us",
+              "we", or "our").
             </p>
 
             <p>

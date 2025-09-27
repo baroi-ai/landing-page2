@@ -24,8 +24,8 @@ const AboutPage = () => {
   const pageTitle = "About Deepshark AI | Our Mission & Cloud-Based AI Tools";
   const pageDescription =
     "Learn about Deepshark AI's mission to make powerful, cloud-based generative AI accessible to everyone. Discover our commitment to privacy, pay-as-you-go pricing, and cutting-edge tools for image, video, and voice creation.";
-  const canonicalUrl = "https://sharkyai.xyz/about";
-  const ogImageUrl = "https://sharkyai.xyz/og-image-about.png"; // IMPORTANT: Create and upload this image
+  const canonicalUrl = "https://deepsharkai.art/about";
+  const ogImageUrl = "https://deepsharkai.art/og-image-about.png"; // IMPORTANT: Create and upload this image
 
   return (
     <div className="flex flex-col min-h-screen bg-dark-500 text-white overflow-x-hidden">
@@ -64,7 +64,7 @@ const AboutPage = () => {
               url: "https://sharkyai.xyz",
               logo: {
                 "@type": "ImageObject",
-                url: "https://sharkyai.xyz/logo.png",
+                url: "https://deepsharkai.art/logo.png",
               },
             },
           })}

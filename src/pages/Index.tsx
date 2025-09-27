@@ -45,8 +45,8 @@ const Index = () => {
   const pageTitle = "Deepshark AI: All in one AI Platform";
   const pageDescription =
     "Explore AI with Deepshark AI. Access powerful open & closed source models for AI image generation, video creation, and voice synthesis. Pay-per-use, privacy-first, and cross-platform.";
-  const canonicalUrl = "https://sharkyai.xyz/";
-  const ogImageUrl = "https://sharkyai.xyz/og-image.png"; // IMPORTANT: Create and upload this image
+  const canonicalUrl = "https://deepsharkai.art/";
+  const ogImageUrl = "https://deepsharkai.art/og-image.png"; // IMPORTANT: Create and upload this image
 
   return (
     <div className="min-h-screen bg-dark-500 text-white overflow-x-hidden">
@@ -78,12 +78,12 @@ const Index = () => {
             "@type": "Organization",
             name: "Deepshark AI",
             url: "https://sharkyai.xyz",
-            logo: "https://sharkyai.xyz/logo.png", // Ensure your logo is at this path
+            logo: "https://deepsharkai.art/logo.png", // Ensure your logo is at this path
             description: pageDescription,
             contactPoint: {
               "@type": "ContactPoint",
               contactType: "customer support",
-              url: "https://sharkyai.xyz/contact", // Add your contact page URL
+              url: "https://deepsharkai.art/contact", // Add your contact page URL
             },
           })}
         </script>
