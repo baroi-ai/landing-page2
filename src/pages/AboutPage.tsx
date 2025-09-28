@@ -183,7 +183,7 @@ const AboutPage = () => {
             className="bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-black font-medium btn-glow"
             asChild
           >
-            <Link to="/dashboard">Start Creating For Free</Link>
+            <Link to="/">Comming Soon...</Link>
           </Button>
         </div>
       </main>
