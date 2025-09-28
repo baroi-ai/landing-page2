@@ -1,0 +1,1 @@
+import{e as a,u as o,j as t,f as r,O as u}from"./index-CZ3PCl2j.js";const n=()=>{const{isAuthenticated:e}=a(),s=o();return e?t.jsx(u,{}):t.jsx(r,{to:"/login",state:{from:s},replace:!0})};export{n as default};
